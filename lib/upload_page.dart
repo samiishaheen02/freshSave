@@ -17,6 +17,8 @@ class _UploadPageState extends State<UploadPage> {
   final TextEditingController _discountedPriceController = TextEditingController();
 
   DateTime? _selectedDate;
+  DateTime? _accessDate;
+
 
   // Date picker function
   Future<void> _pickDate(BuildContext context) async {
@@ -72,6 +74,39 @@ class _UploadPageState extends State<UploadPage> {
               ),
             ),
 
+            const SizedBox(height: 20),
+            // Access Date
+            const Text("When can the food bank access this item before it expires?"),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () async {
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: _accessDate ?? DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2100),
+                );
+
+                if (picked != null && picked != _accessDate) {
+                  setState(() {
+                    _accessDate = picked;
+                  });
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _accessDate == null
+                      ? 'Select date'
+                      : DateFormat('yyyy-MM-dd').format(_accessDate!),
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
 
             // Expiry Date
@@ -142,7 +177,12 @@ class _UploadPageState extends State<UploadPage> {
                   );
                   return;
                 }
-
+                if (_accessDate == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select an access date.')),
+                  );
+                  return;
+                }
                 try {
                   await FirebaseFirestore.instance.collection('food_items').add({
                     'itemName': _itemNameController.text.trim(),
@@ -152,6 +192,8 @@ class _UploadPageState extends State<UploadPage> {
                     'discountedPrice': double.parse(_discountedPriceController.text.trim()),
                     'uploadedBy': user.uid,
                     'timestamp': FieldValue.serverTimestamp(),
+                    'accessibleFrom': _accessDate?.toIso8601String(),
+
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -163,7 +205,10 @@ class _UploadPageState extends State<UploadPage> {
                   _quantityController.clear();
                   _originalPriceController.clear();
                   _discountedPriceController.clear();
-                  setState(() => _selectedDate = null);
+                  setState((){ 
+                    _selectedDate = null;
+                    _accessDate = null;
+                  });
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Upload failed: $e')),

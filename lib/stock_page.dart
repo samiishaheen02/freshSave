@@ -32,6 +32,7 @@ class _StockPageState extends State<StockPage> {
       _items = query.docs;
     });
   }
+
   String _formatDate(String? isoDate) {
     if (isoDate == null) return '-';
     final parsedDate = DateTime.tryParse(isoDate);
@@ -39,80 +40,33 @@ class _StockPageState extends State<StockPage> {
     return DateFormat('yyyy-MM-dd').format(parsedDate);
   }
 
+  void _sendToDonationPool(List<DocumentSnapshot> items) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-  void _promptFoodBankSelection(List<DocumentSnapshot> selectedItems) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Wrap(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Send food to which food bank?',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            ListTile(
-              title: const Text('Food Bank A'),
-              onTap: () {
-                Navigator.pop(context);
-                _sendToFoodBank(selectedItems, "Food Bank A");
-              },
-            ),
-            ListTile(
-              title: const Text('Food Bank B'),
-              onTap: () {
-                Navigator.pop(context);
-                _sendToFoodBank(selectedItems, "Food Bank B");
-              },
-            ),
-          ],
-        );
-      },
+    for (var doc in items) {
+      final data = doc.data() as Map<String, dynamic>;
+
+      await FirebaseFirestore.instance.collection('donated_items').add({
+        'itemName': data['itemName'] ?? '',
+        'quantity': data['quantity'] ?? 0,
+        'originalPrice': data['originalPrice'],
+        'discountedPrice': data['discountedPrice'],
+        'expiryDate': data['expiryDate'],
+        'accessibleFrom': data['accessibleFrom'],
+        'donatedBy': user.uid,
+        'donatedAt': FieldValue.serverTimestamp(),
+      });
+
+      await doc.reference.delete();
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Remaining items donated.')),
     );
+
+    _loadStockItems();
   }
-
-void _sendToFoodBank(List<DocumentSnapshot> items, String foodBankName) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
-
-  List<Map<String, dynamic>> donatedItems = [];
-
-  for (var doc in items) {
-    final data = doc.data() as Map<String, dynamic>;
-
-    donatedItems.add({
-      'itemName': data['itemName'] ?? '',
-      'quantity': data['quantity'] ?? 0,
-    });
-
-    await doc.reference.update({
-      'sentTo': foodBankName,
-      'status': 'donated',
-      'quantity': 0, // reflect donation
-    });
-  }
-
-  await FirebaseFirestore.instance.collection('donation_history').add({
-    'businessId': user.uid,
-    'foodBank': foodBankName,
-    'timestamp': FieldValue.serverTimestamp(),
-    'items': donatedItems,
-  });
-
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Items sent to $foodBankName and logged.')),
-  );
-
-  _loadStockItems(); // Refresh UI
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +116,6 @@ void _sendToFoodBank(List<DocumentSnapshot> items, String foodBankName) async {
                       const SizedBox(height: 8),
                       Text("Quantity: ${item['quantity']}"),
                       Text("Expiry: ${_formatDate(item['expiryDate'])}"),
-
                       const SizedBox(height: 6),
                       Row(
                         children: [
@@ -207,7 +160,7 @@ void _sendToFoodBank(List<DocumentSnapshot> items, String foodBankName) async {
             onPressed: () {
               final remaining = _items.where((doc) {
                 final data = doc.data() as Map<String, dynamic>;
-                return (data['quantity'] ?? 0) > 0 && data['status'] != 'donated';
+                return (data['quantity'] ?? 0) > 0;
               }).toList();
 
               if (remaining.isEmpty) {
@@ -215,7 +168,7 @@ void _sendToFoodBank(List<DocumentSnapshot> items, String foodBankName) async {
                   const SnackBar(content: Text('No remaining items to donate.')),
                 );
               } else {
-                _promptFoodBankSelection(remaining);
+                _sendToDonationPool(remaining);
               }
             },
           ),

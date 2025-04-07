@@ -1,10 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ConsumerRegistrationPage extends StatefulWidget {
   const ConsumerRegistrationPage({super.key});
 
   @override
-  State<ConsumerRegistrationPage> createState() => _ConsumerRegistrationPageState();
+  State<ConsumerRegistrationPage> createState() =>
+      _ConsumerRegistrationPageState();
 }
 
 class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
@@ -14,11 +17,11 @@ class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
-    // Dispose controllers when widget is destroyed
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -26,19 +29,35 @@ class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
     super.dispose();
   }
 
-  void _register() {
+  void _register() async {
     if (_formKey.currentState!.validate()) {
-      // All validation passed
       String name = _fullNameController.text.trim();
       String email = _emailController.text.trim();
-      String password = _passwordController.text;
+      String password = _passwordController.text.trim();
 
-      // TODO: connect to Firebase later
-      print('Registering $name with email $email and password $password');
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration Successful!')),
-      );
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+
+        String uid = userCredential.user!.uid;
+
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'uid': uid,
+          'email': email,
+          'role': 'consumer',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        print('Registering $name with email $email and password $password');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration Successful!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+      }
     }
   }
 
@@ -56,8 +75,11 @@ class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
               TextFormField(
                 controller: _fullNameController,
                 decoration: const InputDecoration(labelText: 'Full Name'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Please enter your name' : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Please enter your name'
+                            : null,
               ),
 
               const SizedBox(height: 16),
@@ -81,8 +103,11 @@ class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: (value) =>
-                    value != null && value.length >= 6 ? null : 'Minimum 6 characters',
+                validator:
+                    (value) =>
+                        value != null && value.length >= 6
+                            ? null
+                            : 'Minimum 6 characters',
               ),
 
               const SizedBox(height: 16),
@@ -90,7 +115,9 @@ class _ConsumerRegistrationPageState extends State<ConsumerRegistrationPage> {
               // Confirm Password
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value != _passwordController.text) {

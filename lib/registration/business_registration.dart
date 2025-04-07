@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'business_homepage.dart';
-import 'login_page.dart';
+import '../homepage/business_homepage.dart';
+import '../login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -8,7 +8,8 @@ class BusinessRegistrationPage extends StatefulWidget {
   const BusinessRegistrationPage({super.key});
 
   @override
-  State<BusinessRegistrationPage> createState() => _BusinessRegistrationPageState();
+  State<BusinessRegistrationPage> createState() =>
+      _BusinessRegistrationPageState();
 }
 
 class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
@@ -17,7 +18,8 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
   final TextEditingController _businessNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -29,44 +31,40 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
   }
 
   void _register() async {
-  if (_formKey.currentState!.validate()) {
-    String businessName = _businessNameController.text.trim();
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+    if (_formKey.currentState!.validate()) {
+      String businessName = _businessNameController.text.trim();
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
 
-    try {
-      // ✅ Create user with Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
 
-      String uid = userCredential.user!.uid;
+        String uid = userCredential.user!.uid;
 
-      // ✅ Save business details + role to Firestore
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'uid': uid,
-        'email': email,
-        'name': businessName,
-        'role': 'business',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'uid': uid,
+          'email': email,
+          'name': businessName,
+          'role': 'business',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Business registered successfully!')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Business registered successfully!')),
+        );
 
-      // ✅ Navigate to Business Homepage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BusinessHomepage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: $e')),
-      );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BusinessHomepage()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +79,11 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
               TextFormField(
                 controller: _businessNameController,
                 decoration: const InputDecoration(labelText: 'Business Name'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter your business name' : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Enter your business name'
+                            : null,
               ),
 
               const SizedBox(height: 16),
@@ -104,15 +105,20 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: (value) =>
-                    value != null && value.length >= 6 ? null : 'Minimum 6 characters',
+                validator:
+                    (value) =>
+                        value != null && value.length >= 6
+                            ? null
+                            : 'Minimum 6 characters',
               ),
 
               const SizedBox(height: 16),
 
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(labelText: 'Confirm Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value != _passwordController.text) {

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "929404283775",
-    "project_id": "freshsave-798a1",
-    "storage_bucket": "freshsave-798a1.firebasestorage.app"
+    "project_number": "666001508056",
+    "project_id": "freshsave-c915c",
+    "storage_bucket": "freshsave-c915c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:929404283775:android:e4f693795b090c0655084a",
+        "mobilesdk_app_id": "1:666001508056:android:6355b10ca3dc42cbe079ad",
         "android_client_info": {
           "package_name": "com.example.freshsave"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAoVpuBPWOshq106FeU2DNAx1ZEGloL4so"
+          "current_key": "AIzaSyD7z0XmZaWwDRc2Defkgr-hpmVDd5mn75o"
         }
       ],
       "services": {

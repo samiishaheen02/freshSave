@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:freshsave_app/main.dart';
-import 'homepage/business_homepage.dart';
-import 'homepage/consumer_homepage.dart';
-import 'homepage/foodbank_homepage.dart';
+import 'business/business_homepage.dart';
+import 'consumer/consumer_homepage.dart';
+import 'foodbank/foodbank_homepage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,23 +14,34 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Controllers for email and password.
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
-  String _selectedRole = 'business'; //
 
   Future<void> _login() async {
     try {
+      // Sign in using FirebaseAuth.
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _email.text.trim(),
         password: _password.text.trim(),
       );
-
       final user = credential.user;
       if (user == null) {
         throw Exception("Login failed: user is null");
       }
+      // Retrieve the user document from Firestore to get the registered role.
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+      if (!userDoc.exists) {
+        throw Exception("User record not found");
+      }
+      final String role = userDoc.get('role');
 
-      switch (_selectedRole) {
+      // Navigate based on the user's role.
+      switch (role) {
         case 'consumer':
           Navigator.pushReplacement(
             context,
@@ -52,9 +64,8 @@ class _LoginPageState extends State<LoginPage> {
           throw Exception("Invalid user role");
       }
     } catch (e, stackTrace) {
-      print('🔥 FULL ERROR: $e');
-      print('📍 STACK TRACE:\n$stackTrace');
-
+      debugPrint('🔥 ERROR: $e');
+      debugPrint('📍 STACK TRACE:\n$stackTrace');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Login failed: ${e.toString()}')));
@@ -72,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Stack(
         children: [
-          // Background image
+          // Background image.
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -81,55 +92,15 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
+          // Dark overlay.
           Container(color: Colors.black.withOpacity(0.5)),
-          // Content
+          // Content.
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
                 const SizedBox(height: 40),
-                // Role selection dropdown
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: DropdownButtonFormField<String>(
-                      dropdownColor: Colors.grey[900],
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        labelText: 'You are:',
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      value: _selectedRole,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'consumer',
-                          child: Text('Consumer'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'business',
-                          child: Text('Business'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'foodbank',
-                          child: Text('Food Bank'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedRole = value;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                // Email text field.
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.7),
@@ -150,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Password text field.
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.7),
@@ -171,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                // Login button.
                 ElevatedButton(
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
@@ -180,6 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: const Text('Login', style: TextStyle(fontSize: 18)),
                 ),
                 const SizedBox(height: 16),
+                // Registration navigation.
                 TextButton(
                   onPressed: () {
                     Navigator.push(

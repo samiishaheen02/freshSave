@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freshsave_app/login_page.dart';
-import '../upload_page.dart';
-import '../stock_page.dart';
+import 'received_page.dart';
+import 'request_items_page.dart';
 
 class FoodBankHomepage extends StatelessWidget {
   const FoodBankHomepage({super.key});
@@ -30,6 +30,26 @@ class FoodBankHomepage extends StatelessWidget {
               ),
             ],
           ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 24),
+      label: Text(text, style: const TextStyle(fontSize: 18)),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 55),
+        backgroundColor: Colors.green.shade600.withOpacity(0.9),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+      ),
     );
   }
 
@@ -67,7 +87,6 @@ class FoodBankHomepage extends StatelessWidget {
             ),
           ),
 
-          // Main content
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -93,23 +112,6 @@ class FoodBankHomepage extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // Charity button
-                  _buildActionButton(
-                    context: context,
-                    text: 'Charity',
-                    icon: Icons.volunteer_activism,
-                    onPressed:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const UploadPage(),
-                          ),
-                        ),
-                  ),
-
-                  const SizedBox(height: 20),
-
                   // Received button
                   _buildActionButton(
                     context: context,
@@ -119,7 +121,21 @@ class FoodBankHomepage extends StatelessWidget {
                         () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const StockPage(),
+                            builder: (context) => const ReceivedPage(),
+                          ),
+                        ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Request Items button
+                  _buildActionButton(
+                    context: context,
+                    text: 'Request Items',
+                    icon: Icons.request_page,
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RequestItemsPage(),
                           ),
                         ),
                   ),
@@ -128,27 +144,6 @@ class FoodBankHomepage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // Reusable button widget
-  Widget _buildActionButton({
-    required BuildContext context,
-    required String text,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 24),
-      label: Text(text, style: const TextStyle(fontSize: 18)),
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 55),
-        backgroundColor: Colors.green.shade600.withOpacity(0.9),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
       ),
     );
   }

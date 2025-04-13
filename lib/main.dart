@@ -33,7 +33,7 @@ class RegistrationHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -52,8 +52,7 @@ class RegistrationHomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-
-              // App Name
+              // App Name.
               const Center(
                 child: Text(
                   'Fresh Save',
@@ -64,16 +63,13 @@ class RegistrationHomePage extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 60),
               const Text(
                 'Register as:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
-
               const SizedBox(height: 20),
-
-              // Role selection dropdown
+              // Role selection dropdown.
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),

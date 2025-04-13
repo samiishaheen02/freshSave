@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../homepage/business_homepage.dart';
+import '../business/business_homepage.dart';
 import '../login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,6 +20,7 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
   @override
   void dispose() {
@@ -27,6 +28,7 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -35,6 +37,7 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
       String businessName = _businessNameController.text.trim();
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
+      String address = _addressController.text.trim();
 
       try {
         UserCredential userCredential = await FirebaseAuth.instance
@@ -46,6 +49,7 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
           'uid': uid,
           'email': email,
           'name': businessName,
+          'address': address,
           'role': 'business',
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -97,6 +101,20 @@ class _BusinessRegistrationPageState extends State<BusinessRegistrationPage> {
                   if (!value.contains('@')) return 'Enter a valid email';
                   return null;
                 },
+              ),
+
+              const SizedBox(height: 16),
+
+              TextFormField(
+                controller: _addressController,
+                decoration: const InputDecoration(
+                  labelText: 'Business Address',
+                ),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Enter your business address'
+                            : null,
               ),
 
               const SizedBox(height: 16),

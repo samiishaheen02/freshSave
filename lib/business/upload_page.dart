@@ -54,15 +54,14 @@ class _UploadPageState extends State<UploadPage> {
               ),
             ),
           ),
-          // Dark overlay - increased opacity to 0.7 for a dimmer effect
+
           Container(color: Colors.black.withOpacity(0.7)),
-          // Content
+
           SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Item Name
                 const Text(
                   "Name of Item",
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -85,7 +84,6 @@ class _UploadPageState extends State<UploadPage> {
 
                 const SizedBox(height: 20),
 
-                // Quantity
                 const Text(
                   "Quantity",
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -108,9 +106,8 @@ class _UploadPageState extends State<UploadPage> {
                 ),
 
                 const SizedBox(height: 20),
-                // Access Date
                 const Text(
-                  "When can the food bank access this item before it expires?",
+                  "Foodbank access date",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
@@ -149,7 +146,6 @@ class _UploadPageState extends State<UploadPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Expiry Date
                 const Text(
                   "Expiry Date",
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -178,7 +174,6 @@ class _UploadPageState extends State<UploadPage> {
 
                 const SizedBox(height: 20),
 
-                // Price Section
                 const Text(
                   "Price",
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -186,7 +181,6 @@ class _UploadPageState extends State<UploadPage> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    // Original Price
                     Expanded(
                       child: TextField(
                         controller: _originalPriceController,
@@ -228,7 +222,6 @@ class _UploadPageState extends State<UploadPage> {
 
                 const SizedBox(height: 40),
 
-                // Submit Button
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
@@ -266,6 +259,7 @@ class _UploadPageState extends State<UploadPage> {
                               'uploadedBy': user.uid,
                               'timestamp': FieldValue.serverTimestamp(),
                               'accessibleFrom': _accessDate?.toIso8601String(),
+                              'status': 'available',
                             });
 
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -274,7 +268,6 @@ class _UploadPageState extends State<UploadPage> {
                           ),
                         );
 
-                        // Clear form
                         _itemNameController.clear();
                         _quantityController.clear();
                         _originalPriceController.clear();

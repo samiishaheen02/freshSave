@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'freshsave-c915c.firebasestorage.app',
     measurementId: 'G-7T7SB1PS7L',
   );
+
 }

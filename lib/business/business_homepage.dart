@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import '../upload_page.dart';
-import '../stock_page.dart';
+import 'upload_page.dart';
+import 'stock_page.dart';
 import '../login_page.dart';
+import 'business_orders_page.dart';
+import 'business_donations_page.dart';
+import 'business_analytics_page.dart';
 
 class BusinessHomepage extends StatelessWidget {
   const BusinessHomepage({super.key});
@@ -85,7 +88,7 @@ class BusinessHomepage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Text(
-                      'Business Account',
+                      'Business Dashboard',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -110,7 +113,10 @@ class BusinessHomepage extends StatelessWidget {
                       ),
                       elevation: 3,
                     ),
-                    child: const Text('Upload', style: TextStyle(fontSize: 18)),
+                    child: const Text(
+                      'Upload Items',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -118,7 +124,11 @@ class BusinessHomepage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const StockPage(),
+                          builder:
+                              (context) => const StockPage(
+                                businessId: '',
+                                businessName: '',
+                              ),
                         ),
                       );
                     },
@@ -130,7 +140,79 @@ class BusinessHomepage extends StatelessWidget {
                       ),
                       elevation: 3,
                     ),
-                    child: const Text('Stock', style: TextStyle(fontSize: 18)),
+                    child: const Text(
+                      'Manage Inventory',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BusinessOrdersPage(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 55),
+                      backgroundColor: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                    child: const Text(
+                      'Customer Orders',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BusinessDonationsPage(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 55),
+                      backgroundColor: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                    child: const Text(
+                      'Manage Donations',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BusinessAnalyticsPage(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 55),
+                      backgroundColor: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                    child: const Text(
+                      'Sales Analytics',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
